@@ -41,48 +41,10 @@ async function initDB() {
   }
 }
 
-// Routes
-// app.get('/', (req, res) => {
-//   res.json({ message: 'Dream Vacation API is running!' });
-// });
-
-// // GET /destinations - Fetch all destinations
-// app.get('/destinations', async (req, res) => {
-//   try {
-//     const result = await pool.query('SELECT * FROM destinations ORDER BY created_at DESC');
-//     res.json(result.rows);
-//   } catch (err) {
-//     console.error('Error fetching destinations:', err);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
-
-// // POST /destinations - Add a new destination
-// app.post('/destinations', async (req, res) => {
-//   try {
-//     const { name } = req.body;
-    
-//     if (!name) {
-//       return res.status(400).json({ error: 'Destination name is required' });
-//     }
-
-//     const result = await pool.query(
-//       'INSERT INTO destinations (name) VALUES ($1) RETURNING *',
-//       [name]
-//     );
-    
-//     res.status(201).json(result.rows[0]);
-//   } catch (err) {
-//     console.error('Error adding destination:', err);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// });
-// Test route
 app.get('/', (req, res) => {
   res.json({ message: 'Dream Vacation API is running!' });
 });
 
-// GET /api/destinations - Fetch all destinations
 app.get('/api/destinations', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM destinations ORDER BY id DESC');
@@ -93,7 +55,7 @@ app.get('/api/destinations', async (req, res) => {
   }
 });
 
-// POST /api/destinations - Add a new destination
+
 app.post('/api/destinations', async (req, res) => {
   const { country } = req.body;
   
@@ -102,7 +64,7 @@ app.post('/api/destinations', async (req, res) => {
   }
 
   try {
-    // For now, let's add a simple destination without external API
+   
     const result = await pool.query(
       'INSERT INTO destinations (country, capital, population, region) VALUES ($1, $2, $3, $4) RETURNING *',
       [country, 'Unknown', 0, 'Unknown']
@@ -127,7 +89,7 @@ app.delete('/api/destinations/:id', async (req, res) => {
   }
 });
 
-// Start server
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
   initDB();
