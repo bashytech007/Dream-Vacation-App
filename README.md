@@ -105,7 +105,7 @@ The CI/CD pipeline automatically:
 4. Submit a pull request
 5. CI/CD pipeline will automatically validate changes
 
-## Deployment
+## Deployments
 
 Docker images are automatically built and available at:
 - Frontend: `[dockerhub-username]/dream-vacation-frontend:latest`
