@@ -1,44 +1,112 @@
 # Dream Vacation Destinations
 
-This application allows users to create a list of countries they'd like to visit, providing basic information about each country. The project is structured to mimic a real-life production environment, employing best practices in software development, deployment, and continuous integration/continuous delivery (CI/CD).
+This application allows users to create a list of countries they'd like to visit, providing basic information about each country. The project is structured to mimic a real-world application environment, employing best practices for software engineering, deployment, and CI/CD processes.
 
-## Setup
+## Project Structure
 
-### Backend
-1. Navigate to the `backend` directory.
-2. Run `npm install` to install dependencies.
-3. Set up your PostgreSQL database and update the `.env` file with your database URL.
-4. Run `npm start` to start the server.
+```
+Dream-Vacation-App/
+├── frontend/           # React frontend application
+├── backend/           # Node.js backend API
+├── .github/workflows/ # CI/CD pipeline configurations
+├── docker-compose.yml # Docker container orchestration
+└── README.md         # Project documentation
+```
 
-### Frontend
-1. Navigate to the `frontend` directory.
-2. Run `npm install` to install dependencies.
-3. Update the `.env` file with your API URL (e.g., `REACT_APP_API_URL=http://localhost:3001`).
-4. Run `npm start` to start the React development server.
+## CI/CD Pipeline
 
-## Features
-- **Add Countries**: Users can add countries to their dream vacation list.
-- **View Country Details**: Displays capital, population, and region information for each country.
-- **Remove Countries**: Users can remove countries from their list.
-- **Production-Ready Setup**: The project is designed to be scalable and maintainable, following industry-standard practices for deployment and CI/CD.
+This project implements automated CI/CD pipelines using GitHub Actions with separate workflows for frontend and backend components.
 
-## Roadmap
-- **CI/CD Implementation**: Automate the build, test, and deployment process using industry-standard CI/CD tools.
-- **Infrastructure as Code (IaC)**: Implement IaC for automated environment setup and management.
-- **Scalability**: Enhance the application to support multiple environments (staging, production) with proper domain names and configurations.
-- **Security**: Utilize Kubernetes Secrets and environment variables for secure data management.
-- **Microservices**: Modularize the application into microservices to improve maintainability and scalability.
+### Workflow Architecture
 
-## Technologies Used
-- **Frontend**: React
-- **Backend**: Node.js with Express
-- **Database**: PostgreSQL
-- **External API**: REST Countries API
-- **CI/CD**: To be implemented with [CI/CD tools, e.g., GitHub Actions, Jenkins, or Azure DevOps]
-- **Infrastructure as Code**: To be implemented with tools like Terraform or Helm
+#### Frontend Pipeline (`.github/workflows/frontend.yml`)
+- **Triggers**: Push to main/develop branches, PRs to main (frontend changes only)
+- **CI Stage**:
+  - Install Node.js dependencies
+  - Run tests with coverage
+  - Build React application
+- **CD Stage**:
+  - Build Docker image
+  - Push to Docker Hub registry
 
-## Best Practices
-- **Version Control**: All changes are tracked in Git for collaboration and history management.
-- **Environment Management**: Separate configurations for different environments (development, staging, production) using environment variables.
-- **Security**: Sensitive information is managed using environment variables and Kubernetes Secrets.
-- **Documentation**: The project is well-documented to facilitate onboarding and maintenance.
+#### Backend Pipeline (`.github/workflows/backend.yml`)
+- **Triggers**: Push to main/develop branches, PRs to main (backend changes only)
+- **CI Stage**:
+  - Install Node.js dependencies
+  - Run backend tests
+- **CD Stage**:
+  - Build Docker image
+  - Push to Docker Hub registry
+
+### Multi-Stage Workflow Benefits
+- **Separation of Concerns**: Frontend and backend pipelines run independently
+- **Efficient Resource Usage**: Only affected components trigger their respective pipelines
+- **Parallel Execution**: Both pipelines can run simultaneously when both components change
+- **Fail-Fast Approach**: Tests run before expensive build operations
+
+### GitHub Secrets Configuration
+The following secrets are configured in GitHub repository settings:
+- `DOCKER_USERNAME`: Docker Hub username for image registry access
+- `DOCKER_PASSWORD`: Docker Hub password/token for authenticated pushes
+
+## Docker Configuration
+
+### Individual Dockerfiles
+- **Frontend Dockerfile**: Multi-stage build (build → nginx serving)
+- **Backend Dockerfile**: Node.js application with production optimizations
+
+### Docker Compose
+The `docker-compose.yml` orchestrates both services:
+- **Backend Service**: Runs on port 5000
+- **Frontend Service**: Runs on port 3000 (mapped to nginx port 80)
+- **Networking**: Services communicate through shared bridge network
+
+## Getting Started
+
+### Prerequisites
+- Docker and Docker Compose
+- Node.js (for local development)
+- GitHub account with repository access
+
+### Local Development
+```bash
+# Clone the repository
+git clone https://github.com/bashytech007/Dream-Vacation-App.git
+cd Dream-Vacation-App
+
+# Run with Docker Compose
+docker-compose up --build
+
+# Or run individually
+cd frontend && npm install && npm start
+cd backend && npm install && npm start
+```
+
+### Production Deployment
+The CI/CD pipeline automatically:
+1. Tests code changes
+2. Builds optimized Docker images
+3. Pushes images to Docker Hub registry
+4. Images are ready for deployment to any Docker-compatible platform
+
+## Automated Features
+
+- **Continuous Integration**: Automated testing on every push/PR
+- **Continuous Deployment**: Automated Docker image builds and registry pushes
+- **Quality Gates**: Tests must pass before deployment
+- **Environment Isolation**: Separate staging and production workflows
+- **Security**: Credentials managed through GitHub Secrets
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make changes and ensure tests pass
+4. Submit a pull request
+5. CI/CD pipeline will automatically validate changes
+
+## Deployment
+
+Docker images are automatically built and available at:
+- Frontend: `[dockerhub-username]/dream-vacation-frontend:latest`
+- Backend: `[dockerhub-username]/dream-vacation-backend:latest`
