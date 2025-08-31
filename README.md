@@ -323,7 +323,7 @@ jobs:
 ### Though they are the same i seperated it to show differences
 ### 4.2 CloudWatch CPU Alarms
 ![CloudWatch Screenshot](screenshots/alarms-dreamvac.png)
-*CloudWatch alarm monitoring CPU utilization > 70%*
+*CloudWatch alarm monitoring CPU's utilization > 70%*
 
 ### 5. CI/CD Pipeline Logs
 <!-- ![Pipeline Screenshot](screenshots/pipeline-logs.png) -->
