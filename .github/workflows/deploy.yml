@@ -66,22 +66,17 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Create SSH key file at runtime
-      run: |
-        echo "${{ secrets.EC2_SSH_PUBLIC_KEY }}" > /tmp/terraform_key.pub
-        chmod 644 /tmp/terraform_key.pub
-
     - name: Terraform Init
       working-directory: ./terraform-infrastructure
       run: terraform init
 
     - name: Terraform Plan
       working-directory: ./terraform-infrastructure
-      run: terraform plan -var="public_key_path=/tmp/terraform_key.pub"
+      run: terraform plan -var="public_key_content=${{ secrets.EC2_SSH_PUBLIC_KEY }}"
 
     - name: Terraform Apply
       working-directory: ./terraform-infrastructure
-      run: terraform apply -auto-approve -var="public_key_path=/tmp/terraform_key.pub"
+      run: terraform apply -auto-approve -var="public_key_content=${{ secrets.EC2_SSH_PUBLIC_KEY }}"
 
     - name: Get Terraform Outputs
       id: terraform-output
@@ -100,7 +95,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Wait for EC2 to be ready
-      run: sleep 60
+      run: sleep 120   # increased to give EC2 time to install Docker
 
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v0.1.5

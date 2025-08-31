@@ -1,8 +1,6 @@
-﻿# Update your variables.tf
-variable "public_key_content" {
-  description = "Content of the SSH public key"
+﻿variable "public_key_path" {
+  description = "Path to the SSH public key"
   type        = string
-  sensitive   = true
 }
 
 variable "aws_region" {
