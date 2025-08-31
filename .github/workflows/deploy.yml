@@ -1,4 +1,5 @@
 name: Deploy Dream Vacation App
+
 on:
   push:
     branches: [ main ]
@@ -12,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-    
+
     - name: Build and push Frontend
       uses: docker/build-push-action@v4
       with:
@@ -30,13 +31,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-    
+
     - name: Build and push Backend
       uses: docker/build-push-action@v4
       with:
@@ -49,49 +50,39 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       instance_ip: ${{ steps.terraform-output.outputs.instance_ip }}
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_wrapper: false
-    
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
-    
-    - name: Create SSH key file
+
+    - name: Create SSH key file at runtime
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_PUBLIC_KEY }}" > ~/.ssh/terraform_key.pub
-        chmod 644 ~/.ssh/terraform_key.pub
-        # Verify the key format
-        ssh-keygen -l -f ~/.ssh/terraform_key.pub || (echo "Invalid public key format" && exit 1)
-    
+        echo "${{ secrets.EC2_SSH_PUBLIC_KEY }}" > /tmp/terraform_key.pub
+        chmod 644 /tmp/terraform_key.pub
+
     - name: Terraform Init
       working-directory: ./terraform-infrastructure
       run: terraform init
-    
-    - name: Import existing resources
-      working-directory: ./terraform-infrastructure
-      run: |
-        terraform import aws_key_pair.dream_key dream-key || true
-        terraform import aws_iam_role.ec2_cloudwatch_role ec2-cloudwatch-role || true
-        terraform import aws_iam_role_policy.ec2_cloudwatch_policy ec2-cloudwatch-role:ec2-cloudwatch-policy || true
-        terraform import aws_iam_instance_profile.ec2_profile ec2-cloudwatch-profile || true
-    
+
     - name: Terraform Plan
       working-directory: ./terraform-infrastructure
-      run: terraform plan -var="public_key_path=$HOME/.ssh/terraform_key.pub"
-    
+      run: terraform plan -var="public_key_path=/tmp/terraform_key.pub"
+
     - name: Terraform Apply
       working-directory: ./terraform-infrastructure
-      run: terraform apply -auto-approve -var="public_key_path=$HOME/.ssh/terraform_key.pub"
-    
+      run: terraform apply -auto-approve -var="public_key_path=/tmp/terraform_key.pub"
+
     - name: Get Terraform Outputs
       id: terraform-output
       working-directory: ./terraform-infrastructure
@@ -104,50 +95,28 @@ jobs:
     needs: terraform
     runs-on: ubuntu-latest
     if: needs.terraform.outputs.instance_ip != ''
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Wait for EC2 to be ready
-      run: sleep 90
-    
+      run: sleep 60
+
     - name: Deploy to EC2
-      uses: appleboy/ssh-action@v1.0.0
+      uses: appleboy/ssh-action@v0.1.5
       with:
         host: ${{ needs.terraform.outputs.instance_ip }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
-        port: 22
-        timeout: 60s
         script: |
-          # Update system
-          sudo apt-get update
-          
-          # Install Docker if not present
-          if ! command -v docker &> /dev/null; then
-            sudo apt-get install -y docker.io
-            sudo systemctl start docker
-            sudo systemctl enable docker
-            sudo usermod -aG docker ubuntu
-          fi
-          
-          # Install Docker Compose if not present
-          if ! command -v docker-compose &> /dev/null; then
-            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-          fi
-          
-          # Create app directory
           mkdir -p ~/dream-vacation-app
           cd ~/dream-vacation-app
-          
-          # Stop existing containers
+
           sudo docker-compose down || true
-          
-          # Pull latest images
+
           sudo docker pull bashtech007/dream-vacation-frontend:latest
           sudo docker pull bashtech007/dream-vacation-backend:latest
-          
-          # Create docker-compose file
+
           cat > docker-compose.yml << 'EOF'
           version: '3.8'
           services:
@@ -156,12 +125,7 @@ jobs:
               ports:
                 - "5000:5000"
               restart: unless-stopped
-              healthcheck:
-                test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-                interval: 30s
-                timeout: 10s
-                retries: 3
-            
+
             frontend:
               image: bashtech007/dream-vacation-frontend:latest
               ports:
@@ -169,19 +133,7 @@ jobs:
               restart: unless-stopped
               depends_on:
                 - backend
-              healthcheck:
-                test: ["CMD", "curl", "-f", "http://localhost:3000"]
-                interval: 30s
-                timeout: 10s
-                retries: 3
           EOF
-          
-          # Start containers
+
           sudo docker-compose up -d
-          
-          # Wait for containers to start
-          sleep 30
-          
-          # Check container status
-          sudo docker-compose ps
-          sudo docker-compose logs --tail=50
+          sudo docker ps
