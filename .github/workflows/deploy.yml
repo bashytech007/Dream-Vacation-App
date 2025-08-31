@@ -76,6 +76,14 @@ jobs:
       working-directory: ./terraform-infrastructure
       run: terraform init
     
+    - name: Import existing resources
+      working-directory: ./terraform-infrastructure
+      run: |
+        terraform import aws_key_pair.dream_key dream-key || true
+        terraform import aws_iam_role.ec2_cloudwatch_role ec2-cloudwatch-role || true
+        terraform import aws_iam_role_policy.ec2_cloudwatch_policy ec2-cloudwatch-role:ec2-cloudwatch-policy || true
+        terraform import aws_iam_instance_profile.ec2_profile ec2-cloudwatch-profile || true
+    
     - name: Terraform Plan
       working-directory: ./terraform-infrastructure
       run: terraform plan -var="public_key_path=$HOME/.ssh/terraform_key.pub"
