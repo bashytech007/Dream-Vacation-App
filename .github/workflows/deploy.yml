@@ -114,11 +114,11 @@ jobs:
     
     - name: Terraform Plan
       working-directory: ./terraform-infrastructure
-      run: terraform plan -var="public_key_path=$HOME/.ssh/terraform_key.pub"
+      run: terraform plan -var="public_key_content=${{ secrets.EC2_SSH_PUBLIC_KEY }}"
     
     - name: Terraform Apply
       working-directory: ./terraform-infrastructure
-      run: terraform apply -auto-approve -var="public_key_path=$HOME/.ssh/terraform_key.pub"
+      run: terraform apply -auto-approve -var="public_key_content=${{ secrets.EC2_SSH_PUBLIC_KEY }}"
     
     - name: Get Terraform Outputs
       id: terraform-output
