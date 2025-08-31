@@ -311,7 +311,7 @@ jobs:
 *VPC (dream-vpc) and Subnet (dream-subnet) created via Terraform*
 
 ### 2. EC2 Instance Running
-![EC2 Screenshot](screenshots/ec2-dreamvac.png)
+![EC2 Screenshot for drean instance](screenshots/ec2-dreamvac.png)
 *EC2 instance (dream-instance) running Ubuntu LTS*
 
 ### 3. Dream Vacation App in Browser
