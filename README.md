@@ -315,7 +315,7 @@ jobs:
 *EC2 instance (dream-instance) running Ubuntu LTS*
 
 ### 3. Dream Vacation App in Browser
-![App Screenshot](screenshots/dreamvacurl.png)
+![App Screenshot for url](screenshots/dreamvacurl.png)
 *Dream Vacation App accessible at http://18.215.118.44*
 
 ### 4.1 CloudWatch CPU Metrics 
