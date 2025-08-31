@@ -308,7 +308,7 @@ jobs:
 *VPC (dream-vpc) and Subnet (dream-subnet) created via Terraform*
 ### though they are together i decided to seperate it
 ![subnet Screenshot](screenshots/subnet-dreamvac.png)
-*VPC (dream-vpc) and Subnet (dream-subnet) created via Terraform*
+*VPC (dream-vpcs) and Subnet (dream-subnet) created via Terraform*
 
 ### 2. EC2 Instance Running
 ![EC2 Screenshot for drean instance](screenshots/ec2-dreamvac.png)
