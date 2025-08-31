@@ -128,7 +128,7 @@ resource "aws_security_group" "dream_sg" {
 # Key Pair for EC2 access
 resource "aws_key_pair" "dream_key" {
   key_name   = "dream-key"
-  public_key = file("C:/Users/USER/.ssh/id_rsa.pub")
+  public_key = file(var.public_key_path)
 }
 
 # IAM Role for EC2 CloudWatch permissions
