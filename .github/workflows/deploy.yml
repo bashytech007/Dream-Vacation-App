@@ -66,24 +66,17 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    # ✅ Write SSH public key to temp file for Terraform
-    - name: Create SSH key file at runtime
-      run: |
-        echo "${{ secrets.EC2_SSH_PUBLIC_KEY }}" > /tmp/terraform_key.pub
-        chmod 644 /tmp/terraform_key.pub
-
     - name: Terraform Init
       working-directory: ./terraform-infrastructure
       run: terraform init
 
-    # ✅ Pass the path Terraform expects
     - name: Terraform Plan
       working-directory: ./terraform-infrastructure
-      run: terraform plan -var="public_key_path=/tmp/terraform_key.pub"
+      run: terraform plan -var="public_key_content=${{ secrets.EC2_SSH_PUBLIC_KEY }}"
 
     - name: Terraform Apply
       working-directory: ./terraform-infrastructure
-      run: terraform apply -auto-approve -var="public_key_path=/tmp/terraform_key.pub"
+      run: terraform apply -auto-approve -var="public_key_content=${{ secrets.EC2_SSH_PUBLIC_KEY }}"
 
     - name: Get Terraform Outputs
       id: terraform-output
