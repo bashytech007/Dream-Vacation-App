@@ -320,7 +320,7 @@ jobs:
 
 ### 4.1 CloudWatch CPU Metrics 
 ![CloudWatch Screenshot](screenshots/metrics-dreamvac.png)
-### Though they are the same i seperated it
+### Though they are the same i seperated it to show differences
 ### 4.2 CloudWatch CPU Alarms
 ![CloudWatch Screenshot](screenshots/alarms-dreamvac.png)
 *CloudWatch alarm monitoring CPU utilization > 70%*
