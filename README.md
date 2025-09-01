@@ -349,7 +349,7 @@ jobs:
 ## Troubleshooting
 
 ### Common Issues
-- **SSH Connection**: Ensure security group allows port 22
+- **SSH Connection**: Ensure security groups allows port 22
 - **Application Access**: Verify security group allows port 80
 - **Docker Issues**: Check `sudo systemctl status docker`
 - **CloudWatch**: Verify IAM permissions for EC2 instance
