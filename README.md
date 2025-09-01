@@ -315,7 +315,7 @@ jobs:
 *EC2 instance (dream-instance) running Ubuntu LTS*
 
 ### 3. Dream Vacation App in Browser
-![App Screenshot for urls](screenshots/dreamvacurl.png)
+![App Screenshot for urls](screenshots/realvac.png)
 *Dream Vacation App accessible at http://18.215.118.44*
 
 ### 4.1 CloudWatch CPU Metrics 
@@ -326,7 +326,7 @@ jobs:
 *CloudWatch alarm monitoring CPU's utilization > 70%*
 
 ### 5. CI/CD Pipeline Logs
-<!-- ![Pipeline Screenshot](screenshots/pipeline-logs.png) -->
+![Pipeline Screenshot](screenshots/ci-cd-logs.png)
 *GitHub Actions pipeline successfully deploying infrastructure and application*
 
 ---
@@ -334,10 +334,10 @@ jobs:
 ## Testing and Verification
 
 ### Manual Testing Steps
-1. SSH into EC2 instance: `ssh -i ~/.ssh/id_rsa ubuntu@18.215.118.44`
+1. SSH into EC2 instance: `ssh -i ~/.ssh/id_rsa ubuntu@http://98.80.167.5/`
 2. Verify Docker containers: `sudo docker ps`
 3. Check application logs: `sudo docker-compose logs`
-4. Test application: Visit http://18.215.118.44
+4. Test application: Visit http://98.80.167.5/
 
 ### Monitoring Verification
 1. Check CloudWatch metrics for CPU utilization
@@ -416,5 +416,5 @@ This project successfully demonstrates:
 - ✅ Containerized application deployment
 - ✅ Full-stack application hosting on AWS
 
-**Application URL**: http://18.215.118.44
+**Application URL**: http://98.80.167.5/
 **Monitoring**: CloudWatch CPU utilization alarm configured for >70% threshold
