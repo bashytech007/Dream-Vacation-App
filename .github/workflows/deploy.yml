@@ -2,11 +2,9 @@ name: Deploy Dream Vacation App
 on:
   push:
     branches: [ main ]
-
 env:
   FRONTEND_IMAGE: bashtech007/dream-vacation-frontend
   BACKEND_IMAGE: bashtech007/dream-vacation-backend
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,38 +15,32 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_wrapper: false
-    
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
-    
     - name: Terraform Init
       working-directory: ./terraform-infrastructure
       run: terraform init
-    
     - name: Terraform Apply
       working-directory: ./terraform-infrastructure
       run: terraform apply -auto-approve -var="public_key_content=${{ secrets.EC2_SSH_PUBLIC_KEY }}"
-    
     - name: Get Instance IP
       working-directory: ./terraform-infrastructure
       run: |
         INSTANCE_IP=$(terraform output -raw instance_public_ip)
         echo "INSTANCE_IP=$INSTANCE_IP" >> $GITHUB_ENV
         echo "Instance IP: $INSTANCE_IP"
-    
     - name: Wait for EC2 to be ready
       run: |
         echo "Waiting for EC2 instance to be ready..."
         sleep 120
-    
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ env.INSTANCE_IP }}
+        host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
@@ -66,14 +58,12 @@ jobs:
             sudo systemctl enable docker
             sudo usermod -aG docker ubuntu
           fi
-          
           # Create app directory and deploy
           mkdir -p ~/dream-vacation-app
           cd ~/dream-vacation-app
           docker-compose down || true
           docker pull ${{ env.FRONTEND_IMAGE }}:latest
           docker pull ${{ env.BACKEND_IMAGE }}:latest
-          
           # Create docker-compose.yml with database
           cat > docker-compose.yml << 'EOF'
           version: '3.8'
@@ -89,17 +79,14 @@ jobs:
               depends_on:
                 - db
               restart: unless-stopped
-              
             frontend:
               image: bashtech007/dream-vacation-frontend:latest
               ports:
-                - "80:3000"
-              environment:
-                - REACT_APP_API_URL=http://${{ env.INSTANCE_IP }}:5000
+                - "80:80"
+              command: ["npx", "serve", "-s", "build", "-l", "80"]
               depends_on:
                 - backend
               restart: unless-stopped
-              
             db:
               image: postgres:13-alpine
               environment:
@@ -111,14 +98,11 @@ jobs:
               volumes:
                 - postgres_data:/var/lib/postgresql/data
               restart: unless-stopped
-          
           volumes:
             postgres_data:
           EOF
-          
           # Start the application
           docker-compose up -d
-          
           # Wait a moment and check status
           sleep 30
           docker ps
