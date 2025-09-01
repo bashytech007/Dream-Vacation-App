@@ -1,3 +1,11 @@
+# Add a name for your workflow (optional but recommended)
+name: Frontend CI
+
+# Add the 'on' block to define the trigger
+on:
+  push:
+    branches:
+      - main
 jobs:
   test:
     runs-on: ubuntu-latest
