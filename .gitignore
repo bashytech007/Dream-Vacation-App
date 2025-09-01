@@ -12,7 +12,7 @@ node_modules
 *.tfstate.*
 *.tfvars
 .terraform.tfstate.lock.info
-# Terraform local state, plans, and backups
+# Terraform local state, plans, and backup
 **/.terraform/
 **/*.tfstate
 **/*.tfstate.*

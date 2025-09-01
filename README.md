@@ -356,7 +356,7 @@ jobs:
 
 ### Useful Commands
 ```bash
-# Check running containers
+# the Check running containers
 sudo docker ps
 
 # View application logs
