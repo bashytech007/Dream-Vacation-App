@@ -1,5 +1,7 @@
-﻿variable "public_key_content" {
-  description = "Content of the SSH public key"
+﻿# In variables.tf
+
+variable "public_key_content" {
+  description = "The public key for EC2 instances"
   type        = string
 }
 
